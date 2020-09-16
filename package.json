@@ -1,0 +1,26 @@
+{
+  "name": "covid-19-bot",
+  "version": "1.0.0",
+  "description": "A discord bot for daily reports",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakobkordez/covid-19-bot.git"
+  },
+  "keywords": [
+    "covid",
+    "bot",
+    "discord"
+  ],
+  "author": "Jakob Kordez",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "discord.js": "^12.3.1"
+  }
+}
