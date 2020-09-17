@@ -1,27 +1,70 @@
-const request = require('request');
+const fs = require('fs');
 
+const EventEmitter = require('events');
+const statTracker = new EventEmitter();
+
+const request = require('request');
+const Stats = require('./stats');
+
+const cacheFile = '.cache'
 const csvUrl = 'https://www.gov.si/teme/koronavirus-sars-cov-2/element/67900/izvoz.csv';
 
-function getData() {
-    return new Promise((resolve, reject) => {
-        request(csvUrl, (err, res, /** @type {string} */ body) => {
-            if (err) reject(err);
+/** @type {Date} */
+var cachedData = readCache();
 
-            if (res.statusCode !== 200) reject(body);
+/** @returns {Promise<Stats>} */
+const getData = () => new Promise((resolve, reject) => {
+    request(csvUrl, (err, res, /** @type {string} */ body) => {
+        if (err) reject(err);
 
-            let x = body.split('\n').map(l => l.split(','));
-            x.pop()
-            x = x.map(r => r.map(c => c.substr(1, c.length-2)));
-            let dic = {};
-            x[0].forEach((e, i) => dic[e] = x[1][i]);
-            dic['Datum'] = new Date(dic['Datum']);
-            resolve(dic);
-        });
+        if (res.statusCode !== 200) reject(body);
+
+        let x = body.trim().split('\n').map(l => l.split(','));
+        x = x.map(r => r.map(c => c.substr(1, c.length - 2)));
+        let dic = {};
+        x[0].forEach((e, i) => dic[e] = x[1][i]);
+
+        resolve(new Stats(dic));
     });
+});
+
+const checkNew = async () => {
+    try {
+        const stats = await getData();
+
+        if (true || !cachedData || stats.date > cachedData) {
+            console.info('New data for date: ', stats.date.toDateString())
+            cachedData = stats.date;
+            writeCache(cachedData);
+            statTracker.emit('newData', stats);
+        }
+    }
+    catch (e) {
+        console.error(e);
+    }
 }
 
-module.exports = {
+setTimeout(() => {
+    checkNew();
+    setTimeout(checkNew, 10 * 60 * 1000);
+}, 5000);
 
-    getData
-    
+
+module.exports = { statTracker }
+
+
+/**
+ * Async write to cache file
+ * @param {*} data
+ */
+function writeCache(data) {
+    fs.writeFile(cacheFile, JSON.stringify(data), () => {});
+}
+
+/**
+ * Sync read from cache file
+ */
+function readCache() {
+    if (!fs.existsSync(cacheFile)) return null;
+    return JSON.parse(fs.readFileSync(cacheFile));
 }
