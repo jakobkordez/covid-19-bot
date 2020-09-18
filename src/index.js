@@ -34,6 +34,7 @@ const broadcast = (message) => {
                 getChannel(g)?.send(message);
             }
             catch (err) {
+                console.error('Error on server:', g.name);
                 console.error(err.message);
             }
         });
