@@ -40,7 +40,7 @@ const broadcast = (message) => {
         });
     }
     else {
-        const bts = bot.guilds.cache.get('446234461244358657')
+        const bts = bot.guilds.cache.get(process.env.DEV_SERVER_ID)
         getChannel(bts)?.send(message);
     }
 }
