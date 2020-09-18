@@ -32,8 +32,7 @@ const checkNew = async () => {
     try {
         const stats = await getData();
 
-        if (true || !cachedData || stats.date > cachedData) {
-            console.info('New data for date: ', stats.date.toDateString())
+        if (!cachedData || stats.date > cachedData) {
             cachedData = stats.date;
             writeCache(cachedData);
             statTracker.emit('newData', stats);

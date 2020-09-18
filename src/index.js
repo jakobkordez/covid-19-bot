@@ -16,15 +16,26 @@ bot.once('ready', () => {
 });
 
 tracker.on('newData', (/** @type {Stats} */ stats) => {
-    bot.guilds.cache.forEach(g => {
-        if (g.id === '446234461244358657') {
-            getChannel(g)?.send(buildEmbed(stats));
-        }
-    })
+    console.info('New data for date: ', stats.date.toDateString())
+    broadcast(buildEmbed(stats));
 });
+
 
 bot.login(TOKEN);
 
+
+/**
+ * @param {*} message 
+ */
+const broadcast = (message) => {
+    if (process.env.NODE_ENV === 'production') {
+        bot.guilds.cache.forEach(g => getChannel(g)?.send(message));
+    }
+    else {
+        const bts = bot.guilds.cache.get('446234461244358657')
+        getChannel(bts)?.send(message);
+    }
+}
 
 /**
  * @param {Discord.Guild} guild
