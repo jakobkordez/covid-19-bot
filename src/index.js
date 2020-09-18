@@ -29,7 +29,14 @@ bot.login(TOKEN);
  */
 const broadcast = (message) => {
     if (process.env.NODE_ENV === 'production') {
-        bot.guilds.cache.forEach(g => getChannel(g)?.send(message));
+        bot.guilds.cache.forEach(g => {
+            try {
+                getChannel(g)?.send(message);
+            }
+            catch (err) {
+                console.error(err.message);
+            }
+        });
     }
     else {
         const bts = bot.guilds.cache.get('446234461244358657')
