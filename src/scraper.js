@@ -9,8 +9,7 @@ const Stats = require('./stats');
 const cacheFile = '.cache'
 const csvUrl = 'https://www.gov.si/teme/koronavirus-sars-cov-2/element/67900/izvoz.csv';
 
-/** @type {Date} */
-var cachedData = readCache();
+var cachedData = new Date(readCache());
 
 /** @returns {Promise<Stats>} */
 const getData = () => new Promise((resolve, reject) => {
