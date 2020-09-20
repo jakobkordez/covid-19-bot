@@ -64,5 +64,7 @@ function writeCache(data) {
  */
 function readCache() {
     if (!fs.existsSync(cacheFile)) return null;
-    return JSON.parse(fs.readFileSync(cacheFile));
+    const data = fs.readFileSync(cacheFile);
+    if (data == '') return null;
+    return JSON.parse(data);
 }

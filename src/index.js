@@ -11,7 +11,10 @@ const TOKEN = process.env.TOKEN;
 bot.once('ready', () => {
     console.info(`\nLogged in as ${bot.user.tag}`);
     console.info(`Active on ${bot.guilds.cache.size} servers`);
-    bot.guilds.cache.forEach(g => console.info(`  - ${g.name} (${g.memberCount})`));
+    bot.guilds.cache.forEach(g => {
+        console.info(`  - ${g.name} (${g.memberCount})`);
+        console.info(`    - ${getChannel(g)?.name}`);
+    });
     console.info();
 });
 
@@ -30,18 +33,16 @@ bot.login(TOKEN);
 const broadcast = (message) => {
     if (process.env.NODE_ENV === 'production') {
         bot.guilds.cache.forEach(g => {
-            try {
-                getChannel(g)?.send(message);
-            }
-            catch (err) {
-                console.error('Error on server:', g.name);
-                console.error(err.message);
-            }
+            getChannel(g)?.send(message).catch(err => {
+                console.error(`Error on server "${bts.name}" : ${err.message}`);
+            });;
         });
     }
-    else {
+    else if (process.env.DEV_SERVER_ID) {
         const bts = bot.guilds.cache.get(process.env.DEV_SERVER_ID)
-        getChannel(bts)?.send(message);
+        getChannel(bts)?.send(message).catch(err => {
+            console.error(`Error on server "${bts.name}" : ${err.message}`);
+        });;
     }
 }
 
@@ -65,8 +66,8 @@ const getChannel = (guild) => {
 const buildEmbed = (stats) => {
     return new Discord.MessageEmbed()
         .setColor('#f44336')
-        .setAuthor('NIJZ', 'https://enki.eu/sites/www.enki.eu/files/upload/images/partners/nijz-logo.png', 'https://www.nijz.si/sl/dnevno-spremljanje-okuzb-s-sars-cov-2-covid-19')
-        .setThumbnail('https://enki.eu/sites/www.enki.eu/files/upload/images/partners/nijz-logo.png')
+        .setAuthor('NIJZ', nijzLogo, 'https://www.nijz.si/sl/dnevno-spremljanje-okuzb-s-sars-cov-2-covid-19')
+        .setThumbnail(nijzLogo)
         .addFields(
             { name: '\u200B', value: '\u200B' },
             { name: 'Št. testiranih', value: stats.tested, inline: true },
@@ -77,3 +78,5 @@ const buildEmbed = (stats) => {
         .setFooter('Stay safe :)')
         .setTimestamp();
 }
+
+const nijzLogo = 'https://enki.eu/sites/www.enki.eu/files/upload/images/partners/nijz-logo.png';
