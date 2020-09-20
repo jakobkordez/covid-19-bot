@@ -34,7 +34,7 @@ const broadcast = (message) => {
     if (process.env.NODE_ENV === 'production') {
         bot.guilds.cache.forEach(g => {
             getChannel(g)?.send(message).catch(err => {
-                console.error(`Error on server "${bts.name}" : ${err.message}`);
+                console.error(`Error on server "${g.name}" : ${err.message}`);
             });;
         });
     }
