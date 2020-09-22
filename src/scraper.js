@@ -44,7 +44,7 @@ const checkNew = async () => {
 
 setTimeout(() => {
     checkNew();
-    setTimeout(checkNew, 10 * 60 * 1000);
+    setInterval(checkNew, 10 * 60 * 1000);
 }, 5000);
 
 
