@@ -64,6 +64,8 @@ const getChannel = (guild) => {
  * @returns {Discord.MessageEmbed}
  */
 const buildEmbed = (stats) => {
+    const percent = stats.positive / stats.tested * 100;
+    
     return new Discord.MessageEmbed()
         .setColor('#f44336')
         .setAuthor('NIJZ', nijzLogo, 'https://www.nijz.si/sl/dnevno-spremljanje-okuzb-s-sars-cov-2-covid-19')
@@ -72,7 +74,7 @@ const buildEmbed = (stats) => {
             { name: '\u200B', value: '\u200B' },
             { name: 'Št. testiranih', value: stats.tested, inline: true },
             { name: '\u200B', value: '\u200B', inline: true },
-            { name: 'Št. pozitivnih', value: stats.positive, inline: true },
+            { name: 'Št. pozitivnih', value: `${stats.positive} (${percent.toFixed(1)}%)`, inline: true },
             { name: '\u200B', value: '\u200B' },
         )
         .setFooter('Stay safe :)')

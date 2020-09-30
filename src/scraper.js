@@ -31,7 +31,7 @@ const checkNew = async () => {
     try {
         const stats = await getData();
 
-        if (!cachedData || stats.date > cachedData) {
+        if (process.env.DEV_SERVER_ID || !cachedData || stats.date > cachedData) {
             cachedData = stats.date;
             writeCache(cachedData);
             statTracker.emit('newData', stats);
