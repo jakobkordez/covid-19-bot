@@ -53,7 +53,6 @@ const broadcast = (message) => {
 
 /**
  * @param {Discord.Guild} guild
- * @param {Discord.GuildChannel} channel
  * @returns {Discord.GuildChannel}
  */
 const getChannel = (guild) => {
