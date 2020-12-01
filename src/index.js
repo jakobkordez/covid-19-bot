@@ -8,6 +8,11 @@ const bot = new Discord.Client();
 
 const TOKEN = process.env.TOKEN;
 
+const cl = ['novice', 'bot', 'bots', 'general'];
+var selectedChannel;
+
+const prefix = 'cv!';
+
 bot.once('ready', () => {
     console.info(`\nLogged in as ${bot.user.tag}`);
     console.info(`Active on ${bot.guilds.cache.size} servers`);
@@ -48,14 +53,28 @@ const broadcast = (message) => {
 
 /**
  * @param {Discord.Guild} guild
+ * @param {Discord.GuildChannel} channel
  * @returns {Discord.GuildChannel}
  */
 const getChannel = (guild) => {
-    const cl = ['novice', 'bot', 'bots', 'general'];
-    for (let i = 0; i < cl.length; ++i) {
-        var fc = guild.channels.cache.find(t => t.type === 'text' && t.name === cl[i]);
-        if (fc) return fc;
+    if (selectedChannel == null) {
+        for (let i = 0; i < cl.length; ++i) {
+            var fc = guild.channels.cache.find(t => t.type === 'text' && t.name === cl[i]);
+            if (fc) {
+                console.log(`Set channel to ${fc}`);
+                return fc;
+            }
+        }
+    } else {
+        var fc = guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel.toString());
+        
+        if (fc == undefined) console.log("Channel not found");
+        else if(fc) {
+            console.log(`Set channel to ${fc}`);
+            return fc;
+        }
     }
+    
     return guild.channels.cache.find(t => t.type === 'text');
 }
 
@@ -82,3 +101,35 @@ const buildEmbed = (stats) => {
 }
 
 const nijzLogo = 'https://enki.eu/sites/www.enki.eu/files/upload/images/partners/nijz-logo.png';
+
+
+bot.on('message', message => {
+    
+    const args = message.content.slice(prefix.length).trim().split(' ');
+    const command = args.shift().toLowerCase();
+
+
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+    else if(command === 'channel') {
+        if(!args.length) {
+            return message.channel.send(`Please select a channel, ${message.author}!`);
+        } else if (args.length > 1){
+            return message.channel.send(`Please select only one channel ${message.author}`)
+        }
+
+        selectedChannel = args;
+        console.log(selectedChannel);
+
+        var channel = message.guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel.toString());
+        
+        
+        if (channel == undefined) {
+            return message.channel.send("Invalid channel!");
+        } else if(channel) {
+            getChannel(message.guild)
+            return message.channel.send(`Set channel to [${selectedChannel}]`);
+        };
+        
+    }
+})
