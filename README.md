@@ -9,6 +9,12 @@ https://discord.com/api/oauth2/authorize?client_id=685875831397941374&permission
 
 Create an image with Docker or use `npm install` then `npm start` to run the bot.
 
+## Channel selection (new)
+
+You can now set a custom channel to send daily reports to.  
+You will need `ADMINISTRATOR` permissions on the server.  
+To set a custom channel use: `cv!channel [channel_name]`.
+
 ## Environment Variables
 
 Environment variables can be read from the root of the project from a `.env` file.
