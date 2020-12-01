@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const fs = require('fs');
+
 const Stats = require('./stats');
 const tracker = require('./scraper').statTracker;
 
@@ -8,8 +10,10 @@ const bot = new Discord.Client();
 
 const TOKEN = process.env.TOKEN;
 
-const cl = ['novice', 'bot', 'bots', 'general'];
-var selectedChannel;
+const channelFiles = '.channels';
+
+const defaultChannels = ['novice', 'bot', 'bots', 'general'];
+const selectedChannels = readFile();
 
 const prefix = 'cv!';
 
@@ -36,18 +40,16 @@ bot.login(TOKEN);
  * @param {*} message 
  */
 const broadcast = (message) => {
+    const send = (guild) => getChannel(guild)?.send(message).catch(err => {
+        console.error(`Error on server "${guild.name}" : ${err.message}`);
+    });
+
     if (process.env.NODE_ENV === 'production') {
-        bot.guilds.cache.forEach(g => {
-            getChannel(g)?.send(message).catch(err => {
-                console.error(`Error on server "${g.name}" : ${err.message}`);
-            });;
-        });
+        bot.guilds.cache.forEach(g => send(g));
     }
     else if (process.env.DEV_SERVER_ID) {
         const bts = bot.guilds.cache.get(process.env.DEV_SERVER_ID)
-        getChannel(bts)?.send(message).catch(err => {
-            console.error(`Error on server "${bts.name}" : ${err.message}`);
-        });;
+        send(bts);
     }
 }
 
@@ -56,24 +58,20 @@ const broadcast = (message) => {
  * @returns {Discord.GuildChannel}
  */
 const getChannel = (guild) => {
-    if (selectedChannel == null) {
-        for (let i = 0; i < cl.length; ++i) {
-            var fc = guild.channels.cache.find(t => t.type === 'text' && t.name === cl[i]);
-            if (fc) {
-                console.log(`Set channel to ${fc}`);
-                return fc;
-            }
-        }
-    } else {
-        var fc = guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel.toString());
-        
-        if (fc == undefined) console.log("Channel not found");
-        else if(fc) {
-            console.log(`Set channel to ${fc}`);
-            return fc;
-        }
+    const customCh = selectedChannels[guild.id];
+
+    if (customCh) {
+        const fc = guild.channels.cache.find(t => t.type === 'text' && t.id === customCh);
+        if (fc) return fc;
+        delete selectedChannels[guild.id];
+        writeToFile(selectedChannels);
     }
-    
+
+    for (let i = 0; i < defaultChannels.length; ++i) {
+        const fc = guild.channels.cache.find(t => t.type === 'text' && t.name === defaultChannels[i]);
+        if (fc) return fc;
+    }
+
     return guild.channels.cache.find(t => t.type === 'text');
 }
 
@@ -83,7 +81,7 @@ const getChannel = (guild) => {
  */
 const buildEmbed = (stats) => {
     const percent = stats.positive / stats.tested * 100;
-    
+
     return new Discord.MessageEmbed()
         .setColor('#f44336')
         .setAuthor('NIJZ', nijzLogo, 'https://www.nijz.si/sl/dnevno-spremljanje-okuzb-s-sars-cov-2-covid-19')
@@ -103,32 +101,45 @@ const nijzLogo = 'https://enki.eu/sites/www.enki.eu/files/upload/images/partners
 
 
 bot.on('message', message => {
-    
+
     const args = message.content.slice(prefix.length).trim().split(' ');
     const command = args.shift().toLowerCase();
 
-
     if (!message.content.startsWith(prefix) || message.author.bot) return;
-
-    else if(command === 'channel') {
-        if(!args.length) {
-            return message.channel.send(`Please select a channel, ${message.author}!`);
-        } else if (args.length > 1){
-            return message.channel.send(`Please select only one channel ${message.author}`)
+    if (command === 'channel') {
+        if (!args.length) {
+            return message.channel.send(`Please select a channel, ${message.author}`);
+        } else if (args.length > 1) {
+            return message.channel.send(`Please select only one channel, ${message.author}`)
         }
 
-        selectedChannel = args;
-        console.log(selectedChannel);
+        const selectedChannel = args[0];
+        var channel = message.guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel);
 
-        var channel = message.guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel.toString());
-        
-        
-        if (channel == undefined) {
-            return message.channel.send("Invalid channel!");
-        } else if(channel) {
-            getChannel(message.guild)
+        if (!channel) {
+            return message.channel.send('Invalid channel!');
+        } else {
+            selectedChannels[message.guild.id] = channel.id;
+            writeToFile(selectedChannels);
             return message.channel.send(`Set channel to [${selectedChannel}]`);
         };
-        
     }
-})
+});
+
+/**
+ * Async write to file
+ * @param {*} data
+ */
+function writeToFile(data) {
+    fs.writeFile(channelFiles, JSON.stringify(data), () => { });
+}
+
+/**
+ * Sync read from file
+ */
+function readFile() {
+    if (!fs.existsSync(channelFiles)) return {};
+    const data = fs.readFileSync(channelFiles);
+    if (data == '') return {};
+    return JSON.parse(data);
+}
