@@ -107,6 +107,12 @@ bot.on('message', message => {
 
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     if (command === 'channel') {
+        const member = message.guild.members.cache.find(m => m.id === message.author.id);
+        if (!member) return;
+        if (!member.hasPermission('ADMINISTRATOR')) {
+            return message.channel.send(`You cannot do that, ${message.author}`);
+        }
+
         if (!args.length) {
             return message.channel.send(`Please select a channel, ${message.author}`);
         } else if (args.length > 1) {
