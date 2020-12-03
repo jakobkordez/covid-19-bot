@@ -48,7 +48,7 @@ const broadcast = (message) => {
         bot.guilds.cache.forEach(g => send(g));
     }
     else if (process.env.DEV_SERVER_ID) {
-        const bts = bot.guilds.cache.get(process.env.DEV_SERVER_ID)
+        const bts = bot.guilds.cache.get(process.env.DEV_SERVER_ID);
         send(bts);
     }
 }
@@ -100,35 +100,41 @@ const buildEmbed = (stats) => {
 const nijzLogo = 'https://enki.eu/sites/www.enki.eu/files/upload/images/partners/nijz-logo.png';
 
 
-bot.on('message', message => {
+bot.on('message', async message => {
 
     const args = message.content.slice(prefix.length).trim().split(' ');
     const command = args.shift().toLowerCase();
 
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     if (command === 'channel') {
-        const member = message.guild.members.cache.find(m => m.id === message.author.id);
-        if (!member) return;
-        if (!member.hasPermission('ADMINISTRATOR')) {
-            return message.channel.send(`You cannot do that, ${message.author}`);
+        try {
+            const member = message.guild.members.cache.find(m => m.id === message.author.id);
+            if (!member) return;
+            if (!member.hasPermission('ADMINISTRATOR')) {
+                return await message.channel.send(`You cannot do that, ${message.author}`);
+            }
+            
+            if (!args.length) {
+                return await message.channel.send(`Please select a channel, ${message.author}`);
+            } else if (args.length > 1) {
+                return await message.channel.send(`Please select only one channel, ${message.author}`)
+            }
+    
+            const selectedChannel = args[0];
+            var channel = message.guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel);
+    
+            if (!channel) {
+                return await message.channel.send('Invalid channel!');
+            } else {
+                selectedChannels[message.guild.id] = channel.id;
+                writeToFile(selectedChannels);
+                return await message.channel.send(`Set channel to [${selectedChannel}]`);
+            };
         }
-
-        if (!args.length) {
-            return message.channel.send(`Please select a channel, ${message.author}`);
-        } else if (args.length > 1) {
-            return message.channel.send(`Please select only one channel, ${message.author}`)
+        catch (e) {
+            console.error(`Error on server "${message.guild.name}" : ${e.message}`);
+            return;
         }
-
-        const selectedChannel = args[0];
-        var channel = message.guild.channels.cache.find(t => t.type === 'text' && t.name === selectedChannel);
-
-        if (!channel) {
-            return message.channel.send('Invalid channel!');
-        } else {
-            selectedChannels[message.guild.id] = channel.id;
-            writeToFile(selectedChannels);
-            return message.channel.send(`Set channel to [${selectedChannel}]`);
-        };
     }
 });
 
