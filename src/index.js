@@ -3,7 +3,8 @@ require('dotenv').config();
 const fs = require('fs');
 
 const Stats = require('./stats');
-const tracker = require('./scraper').statTracker;
+const scraper = require('./scraper');
+const tracker = scraper.statTracker;
 
 const Discord = require('discord.js');
 const bot = new Discord.Client();
@@ -25,6 +26,7 @@ bot.once('ready', () => {
         console.info(`    - ${getChannel(g)?.name}`);
     });
     console.info();
+    scraper.start();
 });
 
 tracker.on('newData', (/** @type {Stats} */ stats) => {

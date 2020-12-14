@@ -43,13 +43,14 @@ const checkNew = async () => {
     }
 }
 
-setTimeout(() => {
-    checkNew();
-    setInterval(checkNew, 10 * 60 * 1000);
-}, 5000);
+const start = () => {
+    setTimeout(() => {
+        checkNew();
+        setInterval(checkNew, 10 * 60 * 1000);
+    }, 5000);
+}
 
-
-module.exports = { statTracker }
+module.exports = { statTracker, start }
 
 
 /**
@@ -57,7 +58,7 @@ module.exports = { statTracker }
  * @param {*} data
  */
 function writeCache(data) {
-    fs.writeFile(cacheFile, JSON.stringify(data), () => {});
+    fs.writeFile(cacheFile, JSON.stringify(data), () => { });
 }
 
 /**
