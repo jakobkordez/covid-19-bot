@@ -14,9 +14,10 @@ var cachedData = new Date(readCache());
 /** @returns {Promise<Stats>} */
 const getData = () => new Promise((resolve, reject) => {
     request(csvUrl, (err, res, /** @type {string} */ body) => {
-        if (err) reject(err);
+        if (err) return reject(err);
+        if (!res) return reject('Unknown error');
 
-        if (res.statusCode !== 200) reject(body);
+        if (res.statusCode !== 200) return reject(body);
 
         let x = body.trim().split('\n').map(l => l.split(','));
         x = x.map(r => r.map(c => c.substr(1, c.length - 2)));
