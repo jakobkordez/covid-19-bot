@@ -7,7 +7,7 @@ const request = require('request');
 const Stats = require('./stats');
 
 const cacheFile = '.cache'
-const csvUrl = 'https://www.gov.si/teme/koronavirus-sars-cov-2/element/67900/izvoz.csv';
+const csvUrl = 'https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/element/66806/graf/csv/103';
 
 var cachedData = new Date(readCache());
 
@@ -22,7 +22,7 @@ const getData = () => new Promise((resolve, reject) => {
         let x = body.trim().split('\n').map(l => l.split(','));
         x = x.map(r => r.map(c => c.substr(1, c.length - 2)));
         let dic = {};
-        x[0].forEach((e, i) => dic[e] = x[1][i]);
+        x[0].forEach((e, i) => dic[e] = x[x.length-1][i]);
 
         resolve(new Stats(dic));
     });

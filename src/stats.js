@@ -4,12 +4,12 @@ class Stats {
      */
     constructor(obj) {
         this.date = new Date(obj['Datum']);
-        this.tested = Number(obj['Opravljeni testi']);
-        this.positive = Number(obj['Pozitivne osebe']);
-        this.hospitalized = Number(obj['Hospitalizirane osebe']);
-        this.hosp_intensive = Number(obj['Osebe na intenzivni negi']);
-        this.hosp_released = Number(obj['Odpuščeni iz bolnišnice']);
-        this.dead = Number(obj['Umrli']);
+        this.tested = Number(obj['?']);
+        this.positive = Number(obj['Dnevno število pozitivnih oseb']);
+        this.hospitalized = Number(obj['Skupno število hospitaliziranih oseb na posamezni dan']);
+        this.hosp_intensive = Number(obj['Skupno število oseb na intenzivni negi na posamezni dan']);
+        this.hosp_released = Number(obj['Dnevno število odpuščenih oseb iz bolnišnice']);
+        this.dead = Number(obj['Skupno število umrlih']);
     }
 }
 
