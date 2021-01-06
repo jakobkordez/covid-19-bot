@@ -7,33 +7,36 @@ const request = require('request');
 const Stats = require('./stats');
 
 const cacheFile = '.cache'
-const csvUrl = 'https://www.gov.si/teme/koronavirus-sars-cov-2/aktualni-podatki/element/66806/graf/csv/103';
+const apiUrl = 'https://api.sledilnik.org/api/stats';
 
-var cachedData = new Date(readCache());
+var cachedData = readCache();
+if (!cachedData) {
+    let today = new Date(Date.now());
+    cachedData = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - 1));
+    writeCache(cachedData);
+}
 
-/** @returns {Promise<Stats>} */
-const getData = () => new Promise((resolve, reject) => {
-    request(csvUrl, (err, res, /** @type {string} */ body) => {
+/**
+ * @param {String} date
+ * @returns {Promise<Stats>}
+ */
+const getData = (date) => new Promise((resolve, reject) => {
+    request(`${apiUrl}?from=${date}`, (err, res, /** @type {string} */ body) => {
         if (err) return reject(err);
         if (!res) return reject('Unknown error');
 
         if (res.statusCode !== 200) return reject(body);
 
-        let x = body.trim().split('\n').map(l => l.split(','));
-        x = x.map(r => r.map(c => c.substr(1, c.length - 2)));
-        let dic = {};
-        x[0].forEach((e, i) => dic[e] = x[x.length-1][i]);
-
-        resolve(new Stats(dic));
+        resolve(JSON.parse(res.body)[0]);
     });
 });
 
 const checkNew = async () => {
     try {
-        const stats = await getData();
+        const stats = await getData(cachedData.toISOString().slice(0, 10));
 
-        if (process.env.DEV_SERVER_ID || !cachedData || stats.date > cachedData) {
-            cachedData = stats.date;
+        if (process.env.DEV_SERVER_ID || (stats && stats.performedTests)) {
+            cachedData.setDate(cachedData.getDate() + 1);
             writeCache(cachedData);
             statTracker.emit('newData', stats);
         }
@@ -68,5 +71,5 @@ function readCache() {
     if (!fs.existsSync(cacheFile)) return null;
     const data = fs.readFileSync(cacheFile);
     if (data == '') return null;
-    return JSON.parse(data);
+    return new Date(JSON.parse(data));
 }

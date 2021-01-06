@@ -3,8 +3,8 @@ require('dotenv').config();
 const fs = require('fs');
 
 const Stats = require('./stats');
-const scraper = require('./scraper');
-const tracker = scraper.statTracker;
+const api = require('./api');
+const tracker = api.statTracker;
 
 const Discord = require('discord.js');
 const bot = new Discord.Client();
@@ -26,11 +26,11 @@ bot.once('ready', () => {
         console.info(`    - ${getChannel(g)?.name}`);
     });
     console.info();
-    scraper.start();
+    api.start();
 });
 
 tracker.on('newData', (/** @type {Stats} */ stats) => {
-    console.info('New data for date: ', stats.date.toDateString())
+    console.info(`New data for date: ${stats.day}.${stats.month}.${stats.year}`)
     broadcast(buildEmbed(stats));
 });
 
@@ -82,22 +82,23 @@ const getChannel = (guild) => {
  * @returns {Discord.MessageEmbed}
  */
 const buildEmbed = (stats) => {
+    const percent = stats.positiveTests / stats.performedTests * 100;
+    
     return new Discord.MessageEmbed()
-        .setColor('#f44336')
-        .setAuthor('NIJZ', nijzLogo, 'https://www.nijz.si/sl/dnevno-spremljanje-okuzb-s-sars-cov-2-covid-19')
-        .setThumbnail(nijzLogo)
+        .setColor('#FFD922')
+        .setAuthor('Sledilnik', logo, 'https://sledilnik.org')
+        .setThumbnail(logo)
         .addFields(
             { name: '\u200B', value: '\u200B' },
-            { name: 'Št. testiranih', value: '?', inline: true },
+            { name: 'Št. testiranih', value: stats.performedTests, inline: true },
             { name: '\u200B', value: '\u200B', inline: true },
-            { name: 'Št. pozitivnih', value: stats.positive, inline: true },
+            { name: 'Št. pozitivnih', value: `${stats.positiveTests} (${percent.toFixed(1)}%)`, inline: true },
             { name: '\u200B', value: '\u200B' },
         )
-        .setFooter('Stay safe :)')
-        .setTimestamp();
+        .setFooter(`Stay safe :) ~ ${stats.day}.${stats.month}.${stats.year}`);
 }
 
-const nijzLogo = 'https://enki.eu/sites/www.enki.eu/files/upload/images/partners/nijz-logo.png';
+const logo = 'https://avatars1.githubusercontent.com/u/62409858';
 
 
 bot.on('message', async message => {
