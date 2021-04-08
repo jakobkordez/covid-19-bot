@@ -5,6 +5,8 @@ A discord bot for daily Covid-19 reports in Slovenia
 Add this bot to your server:  
 https://discord.com/api/oauth2/authorize?client_id=685875831397941374&permissions=19456&scope=bot
 
+<img src="docs/screenshot.png">
+
 ## Setup
 
 Create an image with Docker or use `npm install` then `npm start` to run the bot.
