@@ -1,6 +1,6 @@
 {
   "name": "covid-19-bot",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A discord bot for daily reports",
   "main": "src/index.ts",
   "scripts": {

@@ -11,7 +11,7 @@ https://discord.com/api/oauth2/authorize?client_id=685875831397941374&permission
 
 ```bash
 $ npm install
-$ npm build
+$ npm run build
 
 $ npm run start:prod      # Linux
 $ npm run start:winprod   # Windows
@@ -30,4 +30,4 @@ Environment variables can be read from the root of the project from a `.env` fil
 - `TOKEN` - bot token
 - `NODE_ENV` - already set in `package.json`
 
-* `DEV_SERVER_ID` - server id to send messages when `NODE_ENV` is **NOT** set to `production`
+* `DEV_SERVER_ID` - server id to send messages when `NODE_ENV` is set to `development`
