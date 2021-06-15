@@ -1,11 +1,15 @@
 {
   "name": "covid-19-bot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A discord bot for daily reports",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start:windev": "set NODE_ENV=development&&tsc-watch --onSuccess \"node build/index.js\"",
+    "start:dev": "NODE_ENV=development tsc-watch --onSuccess \"node build/index.js\"",
+    "start:winprod": "set NODE_ENV=production&&node build/index",
+    "start:prod": "NODE_ENV=production node build/index"
   },
   "repository": {
     "type": "git",
@@ -21,12 +25,21 @@
     "Aiken Tine Ahac"
   ],
   "license": "MIT",
-  "devDependencies": {
-    "nodemon": "^2.0.4"
-  },
   "dependencies": {
-    "discord.js": "^12.5.1",
-    "dotenv": "^8.2.0",
-    "request": "^2.88.2"
+    "@typeit/discord": "^4.0.10",
+    "discord.js": "^12.5.3",
+    "node-schedule": "^2.0.0",
+    "request": "^2.88.2",
+    "ts-dotenv": "^0.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.2",
+    "@types/node-schedule": "^1.3.1",
+    "@types/request": "^2.48.5",
+    "prettier": "^2.3.1",
+    "ts-node": "^10.0.0",
+    "tsc-watch": "^4.4.0",
+    "tslib": "^2.2.0",
+    "typescript": "^4.3.2"
   }
 }

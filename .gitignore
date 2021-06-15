@@ -1,7 +1,9 @@
 # My files
-.cache
-.channels
+config.json
 .env
+
+# Project build
+build/
 
 # Logs
 logs
