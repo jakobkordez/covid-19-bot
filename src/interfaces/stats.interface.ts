@@ -5,4 +5,7 @@ export interface Stats {
   day: number;
   performedTests: number;
   positiveTests: number;
+  statePerTreatment: {
+    inHospital: number;
+  };
 }

@@ -49,6 +49,9 @@ export class StatsService {
             year: configService.getLastUpdate().getFullYear(),
             performedTests: 9,
             positiveTests: 4,
+            statePerTreatment: {
+              inHospital: 22,
+            },
           }),
         );
       }

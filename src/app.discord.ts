@@ -94,11 +94,15 @@ export class AppDiscord {
       .setThumbnail(logo)
       .addFields(
         { name: '\u200B', value: '\u200B' },
-        { name: 'Št. testiranih', value: stats.performedTests, inline: true },
-        { name: '\u200B', value: '\u200B', inline: true },
         {
           name: 'Št. pozitivnih',
           value: `${stats.positiveTests} (${percent.toFixed(1)}%)`,
+          inline: true,
+        },
+        { name: '\u200B', value: '\u200B', inline: true },
+        {
+          name: 'Hospitalizirani',
+          value: stats.statePerTreatment.inHospital,
           inline: true,
         },
         { name: '\u200B', value: '\u200B' },
