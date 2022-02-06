@@ -52,6 +52,9 @@ export class StatsService {
             statePerTreatment: {
               inHospital: 22,
             },
+            cases: {
+              confirmedToday: 200,
+            },
           }),
         );
       }

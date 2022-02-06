@@ -10,9 +10,17 @@ export class ConfigService {
     try {
       const data = readFileSync(configFile, { encoding: 'utf8' });
       const parsedData: Config = JSON.parse(data);
+      const today = new Date(Date.now());
       this.config = {
         channels: new Map(parsedData.channels),
-        lastUpdate: new Date(parsedData.lastUpdate),
+        lastUpdate: new Date(
+          parsedData.lastUpdate ??
+            Date.UTC(
+              today.getFullYear(),
+              today.getMonth(),
+              today.getDate() - 1,
+            ),
+        ),
       };
     } catch (e) {
       const today = new Date(Date.now());

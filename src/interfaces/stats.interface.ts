@@ -8,4 +8,7 @@ export interface Stats {
   statePerTreatment: {
     inHospital: number;
   };
+  cases: {
+    confirmedToday: number;
+  };
 }
