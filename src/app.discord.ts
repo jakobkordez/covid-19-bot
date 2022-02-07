@@ -95,14 +95,14 @@ export class AppDiscord {
       .addFields(
         { name: '\u200B', value: '\u200B' },
         {
-          name: 'Št. pozitivnih (PCR)',
-          value: `${stats.positiveTests} (${percent.toFixed(1)}%)`,
+          name: 'Št. novih primerov',
+          value: stats.cases.confirmedToday,
           inline: true,
         },
         { name: '\u200B', value: '\u200B', inline: true },
         {
-          name: 'Št. potrjenih ta dan',
-          value: stats.cases.confirmedToday,
+          name: 'Št. hospitaliziranih',
+          value: stats.statePerTreatment.inHospital,
           inline: true,
         },
         { name: '\u200B', value: '\u200B' },
